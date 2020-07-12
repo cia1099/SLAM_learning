@@ -8,6 +8,7 @@ SLAM
 Contents
  * [3D空間方體運動](#contents)
  * [李群和李代數](#ch4)
+ * [非線性最佳化](#ch6)
 
  ### 3. 3D空間剛體運動
  3.3.1 旋轉向量
@@ -91,3 +92,57 @@ and
 
 因為我們從微分方程解得旋轉矩陣有exponetial解[p.4-5-p.4.6]![](http://latex.codecogs.com/gif.latex?\mathbf{R}=\exp({\mathbf{\Phi}^\wedge})=\exp(\theta\mathbf{a}^\wedge)=\sum^\infty_{n=0}{\frac{1}{n!}(\theta\mathbf{a}^\wedge)^n})，該加總可推得**Rodrigues's Formula**；即我們將李代數so3中的任意元素![](http://latex.codecogs.com/gif.latex?\mathbf{\Phi}=\theta\mathbf{a})，<span style="background-color:yellow">可知![](http://latex.codecogs.com/gif.latex?\mathbf{\Phi})的大小就是旋轉角度，單位方向**a**是旋轉軸。</span>Jl和Jr差在左乘還是右乘的指數矩陣相乘順序在對數相加上的對映。
 <img src="./img/ch4.png"/>
+
+<span id="ch6"></span>
+### 6. 非線性最佳化
+目標函數的下降，實際步驟可寫成：[p.6-10]
+1. 指定某個初值![](http://latex.codecogs.com/gif.latex?\mathbf{x}_0)
+2. 對於第k次反覆運算，尋找一個增量![](http://latex.codecogs.com/gif.latex?\Delta\mathbf{x}_k)，使得![](http://latex.codecogs.com/gif.latex?\parallel{f(\mathbf{x}_k+\Delta\mathbf{x}_k)}\parallel^2_2) 達到最小
+3. 若![](http://latex.codecogs.com/gif.latex?\Delta\mathbf{x}_k) 足夠小，則停止
+4. 不然令![](http://latex.codecogs.com/gif.latex?\mathbf{x}_{k+1}=\mathbf{x}_k+\Delta\mathbf{x}_k)，傳回第二步
+
+在![](http://latex.codecogs.com/gif.latex?\mathbf{x}_k)附近對目標函數進行泰勒展開：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?F(\mathbf{x}_k+\Delta\mathbf{x}_k)\approx{F(\mathbf{x}_k)+\mathbf{J(x_k)}^T\Delta\mathbf{x}_k}+\frac{1}{2}\Delta\mathbf{x}^T_k\mathbf{H(x_k)}\Delta\mathbf{x}_k"/>
+
+1. 如果保留一階梯度，取變化量為反向梯度，即可保證函數下降：
+
+<img src="http://latex.codecogs.com/gif.latex?\Delta\mathbf{x}^*=-\mathbf{J(x_k)}"/>
+
+這種方法被稱**最速下降法**或梯度下降法。
+
+2. 保留二階梯度資訊；求右側等式關於![](http://latex.codecogs.com/gif.latex?\Delta\mathbf{x})的導數並令它為零：
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{J}+\mathbf{H}\Delta\mathbf{x}=\mathbf{0}\Rightarrow{\mathbf{H}\Delta\mathbf{x}^*=-\mathbf{J}}"/>
+
+求解這個線性方程式，就獲得了變化量(增量)。該方法又稱作**牛頓法**，但其中的Hessian矩陣(二階導數)難以計算又複雜。
+
+</div>
+
+##### 6.2.2 高斯牛頓法
+它的思想是將函數只進行一階的泰勒展開，並在這一階展開作最小平方近似：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\Delta\mathbf{x}^*=\arg\underset{\Delta\mathbf{x}}\min\frac{1}{2}\parallel{f(\mathbf{x})+\mathbf{J(x)}^T\Delta\mathbf{x}}\parallel^2"/>
+</div>
+求上式關聯導數，並令其為零得：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{J(x)J(x)^T}\Delta\mathbf{x}=-\mathbf{J(x)}f(\mathbf{x})"/>
+</div>
+
+等式左邊的 **JJ^T**被作為Hessian矩陣(二階梯度)的近似，進一步省略了計算**H**的過程。但在實際資料中， **JJ^T**卻只有半正定，這表示會出現無限多組解(homogenious solution with partical solution)，使得求出來的步進值![](http://latex.codecogs.com/gif.latex?\Delta\mathbf{x})太大，造成發散。因此LM在某個程度上修正了這些問題，一般認為它比高斯牛頓法更穩固，但它的收斂速度可能更慢。
+
+##### 6.2.3 Levenburg-Marquadt's method (LM)
+LM就是在高斯牛頓的目標近似函數加上約束，在Machine leraning稱作Regularization正則化，使得![](http://latex.codecogs.com/gif.latex?\parallel{\mathbf{D}\Delta\mathbf{x}}\parallel^2\leq\mu)，將變化量約束在一個橢球中：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?L(\Delta\mathbf{x},\lambda)=\frac{1}{2}\parallel{f(\mathbf{x})+\mathbf{J(x)}^T\Delta\mathbf{x}}\parallel^2+\frac{\lambda}{2}(\parallel{\mathbf{D}\Delta\mathbf{x}}\parallel^2-\mu)"/>
+
+<img src="http://latex.codecogs.com/gif.latex?\Rightarrow(\mathbf{J(x)J(x)^T}+\lambda\mathbf{D^TD})\Delta\mathbf{x}^*=-\mathbf{J(x)}f(\mathbf{x})"/>
+</div>
+
+我們看到，當lambda比較小時，**JJ^T**佔主要地位，這說明二次近似模型在該範圍內是比較好的，LM方法更接近高斯牛頓法。當lambda比較大時，![](http://latex.codecogs.com/gif.latex?\lambda\mathbf{I})佔主導地位，LM方法更接近一階梯度下降法(即最速下降)，這說明附近的二次近似不夠好。
+
+這個初值是不可隨意設定的，在視覺SLAM中，我們會用ICP或PnP之類的演算法來提供合理的最佳化初值。[p.6-16, 6-17]
