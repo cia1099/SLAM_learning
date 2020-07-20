@@ -9,6 +9,8 @@ Contents
  * [3D空間方體運動](#contents)
  * [李群和李代數](#ch4)
  * [非線性最佳化](#ch6)
+ * Vision Odometry
+    - [Two-view Geometry](#ch7)
 
  ### 3. 3D空間剛體運動
  3.3.1 旋轉向量
@@ -93,6 +95,8 @@ and
 因為我們從微分方程解得旋轉矩陣有exponetial解[p.4-5-p.4.6]![](http://latex.codecogs.com/gif.latex?\mathbf{R}=\exp({\mathbf{\Phi}^\wedge})=\exp(\theta\mathbf{a}^\wedge)=\sum^\infty_{n=0}{\frac{1}{n!}(\theta\mathbf{a}^\wedge)^n})，該加總可推得**Rodrigues's Formula**；即我們將李代數so3中的任意元素![](http://latex.codecogs.com/gif.latex?\mathbf{\Phi}=\theta\mathbf{a})，<span style="background-color:yellow">可知![](http://latex.codecogs.com/gif.latex?\mathbf{\Phi})的大小就是旋轉角度，單位方向**a**是旋轉軸。</span>Jl和Jr差在左乘還是右乘的指數矩陣相乘順序在對數相加上的對映。
 <img src="./img/ch4.png"/>
 
+由上圖可知，我們只要對se3中修改對應的元素，即se3=[平移,轉軸]，將新的se3取指數後相乘原來的Rt矩陣，就直接能獲得平移相加後的t'，旋轉是角度相加後的新的R'矩陣。但要注意作旋轉軸轉動會連帶改變平移，因為t與旋轉軸有關，即t=J*rho，改變的t'不會影響原始的R。
+
 <span id="ch6"></span>
 ### 6. 非線性最佳化
 目標函數的下降，實際步驟可寫成：[p.6-10]
@@ -146,3 +150,117 @@ LM就是在高斯牛頓的目標近似函數加上約束，在Machine leraning�
 我們看到，當lambda比較小時，**JJ^T**佔主要地位，這說明二次近似模型在該範圍內是比較好的，LM方法更接近高斯牛頓法。當lambda比較大時，![](http://latex.codecogs.com/gif.latex?\lambda\mathbf{I})佔主導地位，LM方法更接近一階梯度下降法(即最速下降)，這說明附近的二次近似不夠好。
 
 這個初值是不可隨意設定的，在視覺SLAM中，我們會用ICP或PnP之類的演算法來提供合理的最佳化初值。[p.6-16, 6-17]
+
+----
+<span id="ch7"></span>
+### 7. Two-view Geometry
+對影像提取特徵點的方法有許多種諸如：SIFT、SURF、ORB。這些人工設計的特徵點不外忽擁有以下性質：
+1. Repeatability：相同的特徵點可以在不同影像上找到
+2. Distinctiveness：不同特徵有不同表達
+3. Efficiency：特徵點數量應遠小於像素的數量
+4. Locality：特徵僅與一小片影像區域相關
+
+特徵點由**關鍵點(Key-Point)** 和 **描述子(Descriptor)** 組成。關鍵點是指該特徵點在影像裡的位置；描述子通常是一個向量，按照人為設計的方式，描述了該關鍵點周圍像素的資訊。描述子是按照「外觀相似的特徵應該有相似的描述子」的原則設計的。因此，只要兩個特徵點在描述子的向量空間上的距離相近，就可以認為它們是同樣的特徵點。[p.7-5, 7.1]
+
+>[7.1] Nixon, Mark, and Alberto Aguado. Feature extraction and image processing for computer vision. Academic press, 2019.
+
+##### 7.2.3 計算相機運動
+
+###### 7.3.1 2D-2D epipolar geometry
+[直接參考CSDN：视觉SLAM——两视图对极几何 本质矩阵 基础矩阵 单应矩阵 三角测量](https://blog.csdn.net/qq_41839222/article/details/88104027)
+
+###### 7.7 3D-2D PnP
+Perspective-n-Point是求解3D到2D點對的運動方法。它描述了當知道n個3D空間點及其投影位置時，如何估計相機的位姿。PnP問題有很多種求解方法：P3P[7.2]、DLT、EPnP[7.3]、UPnP[7.4]。其中求解Homography轉換就是DLT。
+
+■ 直接線性轉換 DLT:
+考慮某空間點P1，投影到相機座標點x1(以歸一化平面表示)得：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?s\begin{pmatrix}
+x_1\\
+y_1\\
+1
+\end{pmatrix}=\begin{pmatrix}
+t_1&t_2&t_3&t_4\\
+t_5&t_6&t_7&t_8\\
+t_9&t_{10}&t_{11}&t_{12}
+\end{pmatrix}\begin{pmatrix}
+X_1\\
+Y_1\\
+Z_1\\
+1
+\end{pmatrix}"/>
+
+<img src="http://latex.codecogs.com/gif.latex?\Rightarrow\begin{pmatrix}
+\mathbf{P}_1^T&0&-x_1\mathbf{P}_1^T\\
+0&\mathbf{P}_1^T&-y_1\mathbf{P}_1^T\\
+\vdots&\vdots&\vdots\\
+\mathbf{P}_n^T&0&-x_n\mathbf{P}_n^T\\
+0&\mathbf{P}_n^T&-y_n\mathbf{P}_n^T\\
+\end{pmatrix}\begin{pmatrix}
+\mathbf{t}_1\\
+\mathbf{t}_2\\
+\mathbf{t}_3\end{pmatrix}=0"/>
+</div>
+
+從上式可以發現，每一點 xi 就提供了兩組方程式，求解 t 有12個自由度，但只需要6個點對就有12組方程式，滿足線代的滿秩。<span style="background-color:yellow">注意這裡的相機座標點並非圖像的座標點，這裡的 xi 是還沒乘上相機內參的位置點。</span>因此在程式中對圖像找到的2D-3D匹配點後，還要將 xi 乘上相機內參求解：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{T}^*=\arg\underset{\mathbf{T}}\min\frac{1}{2}\sum_{i=1}^n\parallel\mathbf{u}_i-\frac{1}{s_i}\mathbf{KTP}_i\parallel^2"/>
+</div>
+
+我們在李代數裡知道對「指數矩陣」的微分使用擾動模型近似為[p.4-18]：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{TP}}}{\partial{\mathbf{T}}}=\begin{bmatrix}
+\mathbf{I}&-(\mathbf{TP})^\wedge\\
+\mathbf{0}^T&\mathbf{0}^T
+\end{bmatrix}\equiv(\mathbf{TP})^\odot\in\mathbb{R}^{4\times6}"/>
+
+**Let P' = TP and u' = KP'**
+
+<img src="http://latex.codecogs.com/gif.latex?\therefore\frac{\partial{\mathbf{e}}}{\partial{\mathbf{T}}}=-\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}\frac{\partial{\mathbf{P}'}}{\partial{\mathbf{T}}}"/>
+
+and
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}=\begin{bmatrix}
+\frac{\partial{u}'}{\partial{X}'}&\frac{\partial{u}'}{\partial{Y}'}&\frac{\partial{u}'}{\partial{Z}'}\\
+\frac{\partial{v}'}{\partial{X}'}&\frac{\partial{v}'}{\partial{Y}'}&\frac{\partial{v}'}{\partial{Z}'}
+\end{bmatrix}=\begin{bmatrix}
+\frac{f_x}{Z'}&0&-\frac{f_xX'}{Z'^2}\\
+0&\frac{f_y}{Z'}&-\frac{f_yY'}{Z'^2}
+\end{bmatrix}"/>
+</div>
+
+>[7.2] Gao, Xiao-Shan, et al. "Complete solution classification for the perspective-three-point problem." IEEE transactions on pattern analysis and machine intelligence 25.8 (2003): 930-943.
+[7.3] Lepetit, Vincent, Francesc Moreno-Noguer, and Pascal Fua. "Epnp: An accurate o (n) solution to the pnp problem." International journal of computer vision 81.2 (2009): 155.
+[7.4] Penate-Sanchez, Adrian, Juan Andrade-Cetto, and Francesc Moreno-Noguer. "Exhaustive linearization for robust camera pose and focal length estimation." IEEE transactions on pattern analysis and machine intelligence 35.10 (2013): 2387-2400.
+
+##### 7.9 3D-3D ICP
+Iterative Closet Point 並沒有出現相機內參，也就是說我們不作投影，在兩個點雲集中，只能認為距離最近的兩個點為同一個，所以這個方法稱為反覆運算最近點。[p.7-54]
+
+■ SVD方法
+目標求解相機的相對Rt，在已知配對n個點雲P與P'的情況：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{T}^*=\arg\underset{\mathbf{T}}\min\frac{1}{2}\sum_{i=1}^n\parallel\mathbf{P}_i-\mathbf{TP}'_i\parallel^2"/>
+
+get
+<img src="http://latex.codecogs.com/gif.latex?\sum_{i=1}^n\parallel\mathbf{p}_i-\mathbb{E}(\mathbf{p}_i)-\mathbf{R}(\mathbf{p}'_i-\mathbb{E}(\mathbf{p}'_i))\parallel^2+\parallel\mathbb{E}(\mathbf{p}_i)-\mathbf{R}\mathbb{E}(\mathbf{p}'_i)-\mathbf{t}\parallel^2"/>
+</div>
+
+由上式可知一旦用左邊求得R馬上就能用這個R代入右邊加法為零找t，R的求解[p.7-56, 7.5]：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{W}=\sum_{i=1}^n(\mathbf{p}_i-\mathbb{E}[\mathbf{p}_i])(\mathbf{p}'_i-\mathbb{E}[\mathbf{p}'_i])^T\in\mathbb{R}^{3\times3}"/>
+</div>
+對W作SVD分解，當W滿秩時，R為：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{R}=\mathbf{UV}^T"/>
+
+then
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{t}=\mathbb{E}[\mathbf{p}_i]-\mathbf{R}\mathbb{E}[\mathbf{p}'_i]"/>
+</div>
+如果此時R的行列式為負，則取-R作為最佳值。
+
+>[7.5]Pomerleau, François, Francis Colas, and Roland Siegwart. "A review of point cloud registration algorithms for mobile robotics." (2015).
