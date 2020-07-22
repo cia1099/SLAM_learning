@@ -68,6 +68,26 @@ ki=j,ik=-j
 
 [Eigen對應MATLAB操作](https://igl.ethz.ch/projects/libigl/matlab-to-eigen.html)
 
+###### 5.1.2 扭曲模型
+1. 徑向扭曲 Radial Distortion: k1, k2, k3，主要有**桶形扭曲**和**枕形扭曲**。
+2. [切向扭曲 Tangential distortion](https://de.mathworks.com/help/vision/ug/camera-calibration.html#bu0nj3f): p1, p2。
+
+扭曲模型是在對歸一化平面上的點[x,y,1]計算：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?x_{distorted}=x(1+k_1r^2+k_2r^4+k_3r^6)+2p_1xy+p_2(r^2+2x^2)"/>
+
+<img src="http://latex.codecogs.com/gif.latex?y_{distorted}=y(1+k_1r^2+k_2r^4+k_3r^6)+p_1(r^2+2y^2)+2p_2xy"/>
+
+其中
+<img src="http://latex.codecogs.com/gif.latex?r=\sqrt{x^2+y^2}"/>
+</div>
+然後將扭曲後的點透過內參投影到像素平面，獲得該點在影像上的像素位置：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{u}=\mathbf{K}[x_{distrted}, y_{distorted}, 1]^T"/>
+</div>
+
 <span id="ch4"></span>
 ### 4. 李群和李代數
 <span style="background-color:yellow">群(Group)是一種集合加上一種運算的代數結構。</span>我們以旋轉矩陣為例，旋轉對加法是不封閉的![](http://latex.codecogs.com/gif.latex?\mathbf{R}_1+\mathbf{R}_2\notin{SO(3)})，而乘法是封閉的![](http://latex.codecogs.com/gif.latex?\mathbf{R}_1\mathbf{R}_2\in{SO(3)})，因此對於這種只有一個良好的運算集合，我們稱之為群。
@@ -229,6 +249,16 @@ and
 \frac{f_x}{Z'}&0&-\frac{f_xX'}{Z'^2}\\
 0&\frac{f_y}{Z'}&-\frac{f_yY'}{Z'^2}
 \end{bmatrix}"/>
+</div>
+
+也有對3D點P作最佳化：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{e}}}{\partial{\mathbf{P}}}=-\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}\frac{\partial{\mathbf{P}'}}{\partial{\mathbf{P}}}" />
+
+**∵ P' = RP+t**
+
+<img src="http://latex.codecogs.com/gif.latex?\Rightarrow\frac{\partial{\mathbf{e}}}{\partial{\mathbf{P}}}=-\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}\mathbf{R}" />
 </div>
 
 >[7.2] Gao, Xiao-Shan, et al. "Complete solution classification for the perspective-three-point problem." IEEE transactions on pattern analysis and machine intelligence 25.8 (2003): 930-943.
