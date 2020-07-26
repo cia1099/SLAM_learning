@@ -11,6 +11,7 @@ Contents
  * [非線性最佳化](#ch6)
  * Vision Odometry
     - [Two-view Geometry](#ch7)
+    - [Direct Method](#ch8)
 
  ### 3. 3D空間剛體運動
  3.3.1 旋轉向量
@@ -294,3 +295,49 @@ then
 如果此時R的行列式為負，則取-R作為最佳值。
 
 >[7.5]Pomerleau, François, Francis Colas, and Roland Siegwart. "A review of point cloud registration algorithms for mobile robotics." (2015).
+
+<span id="ch8"></span>
+### 8. Direct Method
+由於在關鍵點與描述子的計算上非常耗時，還有特徵點捨棄了大部分可能有用的像素點，再來影像可能會遇上沒有明顯紋理資訊的畫面，使得特徵點不足比對點來計算匹配。為了克服上述問題，有以下解法：
+1. 保留關鍵點，不計算描述子；使用光流法追蹤關鍵點的運動
+2. 提供想要追蹤的點，直接對這些點進行追蹤，最佳化找出相機運動
+
+###### 8.2 光流
+光流的基本假設：
+● 灰階不變假設
+● 某一視窗內的像素具有相同的運動
+可得：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{I}}}{\partial{x}}\frac{dx}{dt}+\frac{\partial{\mathbf{I}}}{\partial{y}}\frac{dy}{dt}=-\frac{\partial{\mathbf{I}}}{\partial{t}}"/>
+</div>
+考慮一個大小為w×w的窗口，該窗口內的像素具有相同的運動，因此我們有w^2個方程式：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\sum^{w^2}_{k=1}[I_x, I_y]^T_k[I_x, I_y]_k[\frac{dx}{dt},\frac{dy}{dt}]^T=-\sum^{w^2}_{k=1}[I_x, I_y]^T_k[I_t]_k"/>
+</div>
+在實際函數實現中，我們求解這樣一個問題：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\underset{\Delta x,\Delta y}{\min}\parallel\mathbf{I}_1(x,y)-\mathbf{I}_2(x+\Delta x,y+\Delta y)\parallel^2"/>
+</div>
+因此對應的影像梯度為第二個影像在x+Δx, y+Δy處的梯度，但根據Lucas-Kanade光流論文，這裡的梯度也可以用第一張影像的梯度I1(x,y)來代替。這種代替的方法稱為反向光流法；在反向光流中，I1(x,y)的梯度是保持不變的，所以我們在反覆運算時保留影像梯度，即H矩陣不變，每次計算只須計算影像相減的部份，可以節省一部分計算。
+
+在計算光流時，用影像金字塔從頂層影像開始計算，然後把上一層的追蹤結果，作為下一層的初值，這樣的好處是，當原始影像的像素運動較大時，在金字塔頂層的影像看來，運動仍然在一個很小的範圍，這時就明顯好於直接在原始影像上作最佳化。
+
+###### 8.4 直接法
+直接法的想法是由參考p1像素位置，根據目前相機的位姿估計值尋找在目前禎上p1的像素位置，但此時最小化的不是重投影誤差，而是光度誤差，也就是P點在兩個影像上像素的亮度差異：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\underset{\mathbf{T}}{\min}\parallel\mathbf{I}_1(\frac{1}{Z_1}\mathbf{KP})-\mathbf{I}_2(\frac{1}{Z_2}\mathbf{KTP})\parallel^2"/>
+</div>
+注意因為T會影響到Z的大小，故這裡的Z1與Z2是不同相機位姿的成像平面距離，在這裡的代碼是I1固定與p1固定，更動T來產生不同的p2在I2的位置u去比較p1在I1上的亮度值
+
+這裡的Jacobian為：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{e}}{\partial{\mathbf{T}}}=-\frac{\partial\mathbf{I}_2}{\partial\mathbf{u}}\frac{\partial\mathbf{u}}{\partial\partial\mathbf{\xi}}"/>
+</div>
+其中dI2/du為I2在位置u上的梯度，而du/ddxi已經在第七講中DLT裡描述過。
+
+在本章中，我們只計算了單一像素的差異，並且這些差異是由灰階直接相減獲得的。然而單一像素沒有什麼區分性，所以有時我們會使用Normalized Cross Correlation作為度量方式。[p.8-30]
