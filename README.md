@@ -85,7 +85,7 @@ ki=j,ik=-j
 然後將扭曲後的點透過內參投影到像素平面，獲得該點在影像上的像素位置：
 <div align=center>
 
-<img src="http://latex.codecogs.com/gif.latex?\mathbf{u}=\mathbf{K}[x_{distrted}, y_{distorted}, 1]^T"/>
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{u}=\mathbf{K}[x_{distorted}, y_{distorted}, 1]^T"/>
 </div>
 
 <span id="ch4"></span>
@@ -105,7 +105,7 @@ or
 
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{J}_l=\frac{\sin\theta}{\theta}\mathbf{I}+(1-\frac{\sin\theta}{\theta})\mathbf{aa^T}+\frac{1-\cos\theta}{\theta}\mathbf{a}^\wedge"/>
 
-
+inverse J
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{J}^{-1}_l=\frac{\theta}{2}\cot\frac{\theta}{2}\mathbf{I}+(1-\frac{\theta}{2}\cot\frac{\theta}{2})\mathbf{aa^T}+\frac{\theta}{2}\mathbf{a}^\wedge"/>
 
 and
