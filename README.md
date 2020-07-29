@@ -12,6 +12,7 @@ Contents
  * Vision Odometry
     - [Two-view Geometry](#ch7)
     - [Direct Method](#ch8)
+ * [Back-end](#ch9)
 
  ### 3. 3D空間剛體運動
  3.3.1 旋轉向量
@@ -341,3 +342,44 @@ then
 其中dI2/du為I2在位置u上的梯度，而du/ddxi已經在第七講中DLT裡描述過。
 
 在本章中，我們只計算了單一像素的差異，並且這些差異是由灰階直接相減獲得的。然而單一像素沒有什麼區分性，所以有時我們會使用Normalized Cross Correlation作為度量方式。[p.8-30]
+
+----
+<span id="ch9"></span>
+### Back-End
+在沒有運動方程式的情況下，整個最佳化問題就只由許多個觀測方程式組成。這就非常類似SfM問題，相當於我們透過一組影像來恢復運動和結構。不同的是，SLAM中的影像有時間上的順序，而SfM中允許使用完全無關的影像。[p.9-3]
+
+###### 9.2 Bundle Adjustment
+所謂BA，是指從視覺影像中提煉出最佳的3D模型和相機參數。考慮從任意特徵點發射出來的幾束光線(bundles of light rays)，它們會在幾個相機的成像平面上變成像素。如果我們調整各相機姿態和各特徵點的空間位置，使得這些光線最後收束到相機的光心，就稱為BA。[p.9-13]原理就像第7講的PnP。
+
+在求解BA時，我們會對各相機位姿和特徵點建構出一個很大的稀疏矩陣H，H矩陣被分成四塊(2×2)，左上對角塊(H11 or B)只和相機位姿有關，右下對角塊(H22 or C)只和路標點有關；非對角區塊(H12,H21 or E, E^T)是看作是相機位姿與觀測點的偏導對應索引的乘積。
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{H\Delta x=g}\Rightarrow\begin{bmatrix}
+\mathbf{B}&\mathbf{E}\\
+\mathbf{E}^T&\mathbf{C}\end{bmatrix}\begin{bmatrix}
+\Delta\mathbf{x}_c\\ \Delta\mathbf{x}_p
+\end{bmatrix}=\begin{bmatrix}\mathbf{v}\\ \mathbf{w}\end{bmatrix}"/>
+</div>
+在SLAM裡最常用的求解方法為Schur消去，也稱作邊緣化(Marginalization)
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?
+\begin{bmatrix}\mathbf{I}&-\mathbf{EC}^{-1}\\ \mathbf{0}&\mathbf{I}\end{bmatrix}
+\begin{bmatrix}
+\mathbf{B}&\mathbf{E}\\
+\mathbf{E}^T&\mathbf{C}\end{bmatrix}\begin{bmatrix}
+\Delta\mathbf{x}_c\\ \Delta\mathbf{x}_p
+\end{bmatrix}=\begin{bmatrix}\mathbf{I}&-\mathbf{EC}^{-1}\\ \mathbf{0}&\mathbf{I}\end{bmatrix}\begin{bmatrix}\mathbf{v}\\ \mathbf{w}\end{bmatrix}"/>
+
+<img src="http://latex.codecogs.com/gif.latex?\Rightarrow\begin{bmatrix}\mathbf{B}-\mathbf{EC}^{-1}\mathbf{E}^T&\mathbf{0}\\ \mathbf{E}^T&\mathbf{C}\end{bmatrix}\begin{bmatrix}
+\Delta\mathbf{x}_c\\ \Delta\mathbf{x}_p
+\end{bmatrix}=\begin{bmatrix}\mathbf{v-EC^{-1}w}\\ \mathbf{w}\end{bmatrix}"/>
+</div>
+由上式可以觀察到，方程式第一行與Δxp無關了，可以單獨先求得Δxc再利用該解去求Δxp；從機率的角度來看，我們稱這一步為邊緣化，是因為我們實際上把求(Δxc, Δxp)的問題，轉化成了先固定Δxp，求出Δxc，在求Δxp的過程。這一步相當於做了條件機率展開[p.9-23]：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?P(\mathbf{x}_c,\mathbf{x}_p)=P(\mathbf{x}_c|\mathbf{x}_p)P(\mathbf{x}_p)"/>
+</div>
+這結果是求出了關於xp的邊緣分佈，故稱邊緣化。
+
+在SLAM最優化時的核心函數Huber就是深度學習的L1-smooth。[p.9-24]
