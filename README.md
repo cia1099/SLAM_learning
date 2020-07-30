@@ -78,10 +78,9 @@ ki=j,ik=-j
 <div align=center>
 
 <img src="http://latex.codecogs.com/gif.latex?x_{distorted}=x(1+k_1r^2+k_2r^4+k_3r^6)+2p_1xy+p_2(r^2+2x^2)"/>
-
+---
 <img src="http://latex.codecogs.com/gif.latex?y_{distorted}=y(1+k_1r^2+k_2r^4+k_3r^6)+p_1(r^2+2y^2)+2p_2xy"/>
-
-其中
+---
 <img src="http://latex.codecogs.com/gif.latex?r=\sqrt{x^2+y^2}"/>
 </div>
 然後將扭曲後的點透過內參投影到像素平面，獲得該點在影像上的像素位置：
@@ -98,19 +97,16 @@ ki=j,ik=-j
 <div align=center>
 
 <img src="http://latex.codecogs.com/gif.latex?\exp(\Delta\mathbf{\Phi}^\wedge)\exp(\mathbf{\Phi}^\wedge)=\exp[(\mathbf{\Phi}+\mathbf{J}^{-1}_l\Delta\mathbf{\Phi})^\wedge]"/>
-
-or
+---
 <img src="http://latex.codecogs.com/gif.latex?\exp[(\mathbf{J}_l\Delta\mathbf{\Phi})^\wedge]\exp(\mathbf{\Phi}^\wedge)=\exp[(\mathbf{\Phi}+\Delta\mathbf{\Phi})^\wedge]=\exp(\mathbf{\Phi}^\wedge)\exp[(\mathbf{J}_r\Delta\mathbf{\Phi})^\wedge]"/>
 </div>
 其中近似雅可比矩陣：
 <div align=center>
 
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{J}_l=\frac{\sin\theta}{\theta}\mathbf{I}+(1-\frac{\sin\theta}{\theta})\mathbf{aa^T}+\frac{1-\cos\theta}{\theta}\mathbf{a}^\wedge"/>
-
-inverse J
+---
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{J}^{-1}_l=\frac{\theta}{2}\cot\frac{\theta}{2}\mathbf{I}+(1-\frac{\theta}{2}\cot\frac{\theta}{2})\mathbf{aa^T}+\frac{\theta}{2}\mathbf{a}^\wedge"/>
-
-and
+---
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{J}_r(\mathbf{\Phi})=\mathbf{J}_l(-\mathbf{\Phi})"/>
 </div>
 
@@ -165,7 +161,7 @@ LM就是在高斯牛頓的目標近似函數加上約束，在Machine leraning�
 <div align=center>
 
 <img src="http://latex.codecogs.com/gif.latex?L(\Delta\mathbf{x},\lambda)=\frac{1}{2}\parallel{f(\mathbf{x})+\mathbf{J(x)}^T\Delta\mathbf{x}}\parallel^2+\frac{\lambda}{2}(\parallel{\mathbf{D}\Delta\mathbf{x}}\parallel^2-\mu)"/>
-
+---
 <img src="http://latex.codecogs.com/gif.latex?\Rightarrow(\mathbf{J(x)J(x)^T}+\lambda\mathbf{D^TD})\Delta\mathbf{x}^*=-\mathbf{J(x)}f(\mathbf{x})"/>
 </div>
 
@@ -212,7 +208,7 @@ Y_1\\
 Z_1\\
 1
 \end{pmatrix}"/>
-
+---
 <img src="http://latex.codecogs.com/gif.latex?\Rightarrow\begin{pmatrix}
 \mathbf{P}_1^T&0&-x_1\mathbf{P}_1^T\\
 0&\mathbf{P}_1^T&-y_1\mathbf{P}_1^T\\
@@ -242,8 +238,7 @@ Z_1\\
 **Let P' = TP and u' = KP'**
 
 <img src="http://latex.codecogs.com/gif.latex?\therefore\frac{\partial{\mathbf{e}}}{\partial{\mathbf{T}}}=-\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}\frac{\partial{\mathbf{P}'}}{\partial{\mathbf{T}}}"/>
-
-and
+---
 <img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}=\begin{bmatrix}
 \frac{\partial{u}'}{\partial{X}'}&\frac{\partial{u}'}{\partial{Y}'}&\frac{\partial{u}'}{\partial{Z}'}\\
 \frac{\partial{v}'}{\partial{X}'}&\frac{\partial{v}'}{\partial{Y}'}&\frac{\partial{v}'}{\partial{Z}'}
@@ -275,8 +270,7 @@ Iterative Closet Point 並沒有出現相機內參，也就是說我們不作投
 <div align=center>
 
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{T}^*=\arg\underset{\mathbf{T}}\min\frac{1}{2}\sum_{i=1}^n\parallel\mathbf{P}_i-\mathbf{TP}'_i\parallel^2"/>
-
-get
+---
 <img src="http://latex.codecogs.com/gif.latex?\sum_{i=1}^n\parallel\mathbf{p}_i-\mathbb{E}(\mathbf{p}_i)-\mathbf{R}(\mathbf{p}'_i-\mathbb{E}(\mathbf{p}'_i))\parallel^2+\parallel\mathbb{E}(\mathbf{p}_i)-\mathbf{R}\mathbb{E}(\mathbf{p}'_i)-\mathbf{t}\parallel^2"/>
 </div>
 
@@ -289,8 +283,7 @@ get
 <div align=center>
 
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{R}=\mathbf{UV}^T"/>
-
-then
+---
 <img src="http://latex.codecogs.com/gif.latex?\mathbf{t}=\mathbb{E}[\mathbf{p}_i]-\mathbf{R}\mathbb{E}[\mathbf{p}'_i]"/>
 </div>
 如果此時R的行列式為負，則取-R作為最佳值。
@@ -337,7 +330,7 @@ then
 這裡的Jacobian為：
 <div align=center>
 
-<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{e}}{\partial{\mathbf{T}}}=-\frac{\partial\mathbf{I}_2}{\partial\mathbf{u}}\frac{\partial\mathbf{u}}{\partial\partial\mathbf{\xi}}"/>
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{e}}{\partial{\mathbf{T}}}=-\frac{\partial\mathbf{I}_2}{\partial\mathbf{u}}\frac{\partial\mathbf{u}}{\partial\Delta\mathbf{\xi}}"/>
 </div>
 其中dI2/du為I2在位置u上的梯度，而du/ddxi已經在第七講中DLT裡描述過。
 
@@ -370,7 +363,7 @@ then
 \mathbf{E}^T&\mathbf{C}\end{bmatrix}\begin{bmatrix}
 \Delta\mathbf{x}_c\\ \Delta\mathbf{x}_p
 \end{bmatrix}=\begin{bmatrix}\mathbf{I}&-\mathbf{EC}^{-1}\\ \mathbf{0}&\mathbf{I}\end{bmatrix}\begin{bmatrix}\mathbf{v}\\ \mathbf{w}\end{bmatrix}"/>
-
+---
 <img src="http://latex.codecogs.com/gif.latex?\Rightarrow\begin{bmatrix}\mathbf{B}-\mathbf{EC}^{-1}\mathbf{E}^T&\mathbf{0}\\ \mathbf{E}^T&\mathbf{C}\end{bmatrix}\begin{bmatrix}
 \Delta\mathbf{x}_c\\ \Delta\mathbf{x}_p
 \end{bmatrix}=\begin{bmatrix}\mathbf{v-EC^{-1}w}\\ \mathbf{w}\end{bmatrix}"/>
@@ -383,3 +376,34 @@ then
 這結果是求出了關於xp的邊緣分佈，故稱邊緣化。
 
 在SLAM最優化時的核心函數Huber就是深度學習的L1-smooth。[p.9-24]
+
+----
+為了SLAM系統的實時性，我們通常要控制BA的規模，常見的方式有：
+
+###### 10.1.2 滑動視窗法(關鍵頁框)
+保持被邊緣化的關鍵頁框的估計值，求其他狀態變數以這個關鍵頁框為條件的機率[p.10-3~p.10-6]
+###### 10.2 位姿圖
+即只最佳化相機位姿，不作路標點的最佳化[p.10-7]
+
+位姿圖的節點可以用相機位姿T1, T2, ...Tn來表達。而邊是以兩位姿節點之間的相對運動估計：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{T}_{ij}=\mathbf{T}^{-1}_i\mathbf{T}_j"/>
+</div>
+建置誤差為：[p.10-8]
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\mathbf{e}_{ij}=\ln(\mathbf{T}^{-1}_{ij}\mathbf{T}^{-1}_i\mathbf{T}_j)^\vee\in\mathbb{R}^{6\times1}"/>
+</div>
+誤差關於兩個位姿的Jacobian矩陣：
+<div align=center>
+
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{e}_{ij}}}{\partial{\mathbf{\Delta\xi}_i}}=-J^{-1}_r(\mathbf{e}_{ij})Ad(\mathbf{T}^{-1}_j)"/>
+---
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{e}_{ij}}}{\partial{\mathbf{\Delta\xi}_j}}=J^{-1}_r(\mathbf{e}_{ij})Ad(\mathbf{T}^{-1}_j)"/>
+---
+<img src="http://latex.codecogs.com/gif.latex?J^{-1}_r(\mathbf{e}_{ij})\approx\mathbf{I}+\frac{1}{2}
+\begin{bmatrix}\mathbf{\Phi}^\wedge_e&\mathbf{\rho}^\wedge_e\\ \mathbf{0}&\mathbf{\Phi}^\wedge_e\end{bmatrix}"/>
+</div>
+
+如何實作，可參考代碼[slambook2/ch10/pose_graph_g2o_lie_algebra.cpp](https://github.com/gaoxiang12/slambook2/blob/master/ch10/pose_graph_g2o_lie_algebra.cpp)
