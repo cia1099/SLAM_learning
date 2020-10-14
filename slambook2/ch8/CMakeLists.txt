@@ -18,6 +18,7 @@ include_directories(
         "/usr/include/eigen3/"
         ${Pangolin_INCLUDE_DIRS}
 )
+message(STATUS "opencv include: ${OpenCV_INCLUDE_DIRS}")
 
 add_executable(optical_flow optical_flow.cpp)
 target_link_libraries(optical_flow ${OpenCV_LIBS})

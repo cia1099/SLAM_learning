@@ -122,6 +122,8 @@ ki=j,ik=-j
 2. 對於第k次反覆運算，尋找一個增量![](http://latex.codecogs.com/gif.latex?\Delta\mathbf{x}_k)，使得![](http://latex.codecogs.com/gif.latex?\parallel{f(\mathbf{x}_k+\Delta\mathbf{x}_k)}\parallel^2_2) 達到最小
 3. 若![](http://latex.codecogs.com/gif.latex?\Delta\mathbf{x}_k) 足夠小，則停止
 4. 不然令![](http://latex.codecogs.com/gif.latex?\mathbf{x}_{k+1}=\mathbf{x}_k+\Delta\mathbf{x}_k)，傳回第二步
+5. 向量對向量的微分一定要是分母與分子是row/col或col/row的關係，才能微分出擴展開的矩陣Gradient或Jacobian。[look Matrix_claculus](https://en.wikipedia.org/wiki/Matrix_calculus)
+6. 在SLAM領域中，偏好的是：如果為vector-by-vector就以Jacobian形式微分；如果是scalar-by-vector就以gradient形式微分；若為scalar-by-matrix也是以Jacobian形式微分。
 
 在![](http://latex.codecogs.com/gif.latex?\mathbf{x}_k)附近對目標函數進行泰勒展開：
 <div align=center>
