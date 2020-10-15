@@ -10,7 +10,7 @@
 
 namespace myslam {
 
-Viewer::Viewer() {
+Viewer::Viewer():coco_(80) {
     viewer_thread_ = std::thread(std::bind(&Viewer::ThreadLoop, this));  
 }
 
@@ -63,6 +63,18 @@ void Viewer::ThreadLoop() {
             FollowCurrentFrame(vis_camera);
 
             cv::Mat img = PlotFrameImage();
+
+            auto ob_result = current_frame_->ob_result_.accessor<float,2>();
+            for (int i = 0; i < ob_result.size(0) ; i++){
+                cv::rectangle(img, cv::Point(ob_result[i][1], ob_result[i][2]), cv::Point(ob_result[i][3], ob_result[i][4]), cv::Scalar(0, 0, 255), 1, 1, 0);
+                cv::Point tp(ob_result[i][1], ob_result[i][2]);
+                float score = ob_result[i][5]*ob_result[i][6];
+                std::stringstream scorestream;
+                scorestream << std::setprecision(4) << score;
+                cv::putText(img, coco_[ob_result[i][7]]+":"+scorestream.str(),
+                    tp-cv::Point(0,5),cv::FONT_HERSHEY_COMPLEX_SMALL, 0.5, cv::Scalar(0,0,255),1,cv::LINE_AA);
+            }
+
             cv::imshow("image", img);
             cv::waitKey(1);
         }

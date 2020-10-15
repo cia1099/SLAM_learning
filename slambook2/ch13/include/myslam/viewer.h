@@ -46,6 +46,8 @@ class Viewer {
     /// plot the features in current frame into an image
     cv::Mat PlotFrameImage();
 
+    std::vector<std::string> coco_;
+
     Frame::Ptr current_frame_ = nullptr;
     Map::Ptr map_ = nullptr;
 
