@@ -11,7 +11,7 @@
 namespace myslam {
 
 Viewer::Viewer() {
-    viewer_thread_ = std::thread(std::bind(&Viewer::ThreadLoop, this));
+    viewer_thread_ = std::thread(std::bind(&Viewer::ThreadLoop, this));  
 }
 
 void Viewer::Close() {
@@ -33,6 +33,7 @@ void Viewer::UpdateMap() {
 }
 
 void Viewer::ThreadLoop() {
+    cv::namedWindow("image", cv::WINDOW_NORMAL);
     pangolin::CreateWindowAndBind("MySLAM", 1024, 768);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);

@@ -51,7 +51,7 @@ set(Torch_DIR "/home/cia1099/Downloads/libtorch/share/cmake/Torch")
 set(DarkNet_DIR "/home/cia1099/project/ML/libtorch-yolov3/")
 find_package(Torch REQUIRED)
 include_directories( ${TORCH_INCLUDE_DIRS} )
-include_directories("${DarkNet_DIR}Darknet.h")
+# include_directories("${DarkNet_DIR}Darknet.h")
 
 set(THIRD_PARTY_LIBS
         ${OpenCV_LIBS}

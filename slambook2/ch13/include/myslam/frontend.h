@@ -7,7 +7,7 @@
 #include "myslam/common_include.h"
 #include "myslam/frame.h"
 #include "myslam/map.h"
-#include "Darknet.h"
+
 
 namespace myslam {
 
