@@ -5,7 +5,7 @@
 
 #include "myslam/camera.h"
 #include "myslam/common_include.h"
-#include <torch/torch.h>
+// #include <torch/torch.h>
 
 namespace myslam {
 
@@ -29,8 +29,9 @@ struct Frame {
     SE3 pose_;                       // Tcw 形式Pose
     std::mutex pose_mutex_;          // Pose数据锁
     cv::Mat left_img_, right_img_;   // stereo images
-    torch::Tensor ob_result_; // yolo result
+    // torch::Tensor ob_result_; // yolo result
     std::mutex ob_mutex_; // object detect lock
+    std::vector<std::vector<float>> ob_result_;
 
     // extracted features in left image
     std::vector<std::shared_ptr<Feature>> features_left_;
@@ -54,7 +55,7 @@ struct Frame {
         pose_ = pose;
     }
 
-    void SetObjectResult(const torch::Tensor& ob){
+    void SetObjectResult(const std::vector<std::vector<float>>& ob){
         std::unique_lock<std::mutex> lck(ob_mutex_);
         ob_result_ = ob;
     }

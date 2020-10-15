@@ -13,7 +13,7 @@ add_library(myslam SHARED
         visual_odometry.cpp
         dataset.cpp)
 
-add_library(yolov3 SHARED ${DarkNet_DIR}Darknet.cpp)
+add_library(yolov3 SHARED ${DarkNet_DIR}Darknet.cpp yolov3.cpp)
 
 target_link_libraries(myslam
         ${THIRD_PARTY_LIBS} yolov3)
