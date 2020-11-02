@@ -11,6 +11,11 @@
 namespace myslam {
 
 Viewer::Viewer():coco_(80) {
+    std::string classPath("/home/cia1099/project/ML/PyTorch-YOLOv3/data/coco.names");
+    std::ifstream cocofile;
+    cocofile.open(classPath, std::ios::in);
+    for(int i=0;i!=80;++i)
+        std::getline(cocofile, coco_[i]);
     viewer_thread_ = std::thread(std::bind(&Viewer::ThreadLoop, this));  
 }
 
@@ -59,22 +64,27 @@ void Viewer::ThreadLoop() {
 
         std::unique_lock<std::mutex> lock(viewer_data_mutex_, std::try_to_lock);
         if (lock and current_frame_) {
+            auto toc = std::chrono::steady_clock::now();
+            std::chrono::duration<double> time_used = std::chrono::duration_cast<std::chrono::duration<double>>(toc - record_time_);
+            std::string FPS = std::to_string((int)std::ceil(1.0/(time_used.count()+inv_30fps)) );
             DrawFrame(current_frame_, green);
             FollowCurrentFrame(vis_camera);
 
             cv::Mat img = PlotFrameImage();
 
-            // auto ob_result = current_frame_->ob_result_.accessor<float,2>();
-            // for (int i = 0; i < ob_result.size(0) ; i++){
-            //     cv::rectangle(img, cv::Point(ob_result[i][1], ob_result[i][2]), cv::Point(ob_result[i][3], ob_result[i][4]), cv::Scalar(0, 0, 255), 1, 1, 0);
-            //     cv::Point tp(ob_result[i][1], ob_result[i][2]);
-            //     float score = ob_result[i][5]*ob_result[i][6];
-            //     std::stringstream scorestream;
-            //     scorestream << std::setprecision(4) << score;
-            //     cv::putText(img, coco_[ob_result[i][7]]+":"+scorestream.str(),
-            //         tp-cv::Point(0,5),cv::FONT_HERSHEY_COMPLEX_SMALL, 0.5, cv::Scalar(0,0,255),1,cv::LINE_AA);
-            // }
-
+            auto ob_result = current_frame_->ob_result_;
+            for (int i = 0; i < ob_result.size() ; i++){
+                cv::rectangle(img, cv::Point(ob_result[i][0], ob_result[i][1]), cv::Point(ob_result[i][2], ob_result[i][3]), cv::Scalar(0, 0, 255), 1, 1, 0);
+                cv::Point tp(ob_result[i][0], ob_result[i][1]);
+                float score = ob_result[i][4]*ob_result[i][5];
+                std::stringstream scorestream;
+                scorestream << std::setprecision(4) << score;
+                cv::putText(img, coco_[ob_result[i][6]]+":"+scorestream.str(),
+                    tp-cv::Point(0,5),cv::FONT_HERSHEY_COMPLEX_SMALL, 0.5, cv::Scalar(0,0,255),1,cv::LINE_AA);
+            }
+            cv::putText(img, "FPS = "+FPS, cv::Point(img.rows>>2,img.cols>>4),
+                    cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255,0,255),2,cv::LINE_AA);
+            record_time_ = toc;
             cv::imshow("image", img);
             cv::waitKey(1);
         }

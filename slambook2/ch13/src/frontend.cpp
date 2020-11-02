@@ -3,6 +3,7 @@
 //
 
 #include <opencv2/opencv.hpp>
+#include <future>
 
 #include "myslam/algorithm.h"
 #include "myslam/backend.h"
@@ -46,6 +47,14 @@ bool Frontend::Track() {
     if (last_frame_) {
         current_frame_->SetPose(relative_motion_ * last_frame_->Pose());
     }
+    // if (yolo_) {
+    //     // yolo_->addCurrentFrame(current_frame_);
+    //     // auto yolo_run = std::async(std::launch::async, &Yolov3::inference, this->yolo_);
+    //     // yolo_->inference();
+        // yolo_->inference(current_frame_);
+    // }
+    auto yolo_run = std::async(std::launch::async, &Yolov3::inference, yolo_, current_frame_);
+    // std::thread yolo_thread(&Yolov3::inference, yolo_, current_frame_);
 
     int num_track_last = TrackLastFrame();
     tracking_inliers_ = EstimateCurrentPose();
@@ -63,7 +72,8 @@ bool Frontend::Track() {
 
     InsertKeyframe();
     relative_motion_ = current_frame_->Pose() * last_frame_->Pose().inverse();
-
+    // yolo_thread.join();
+    
     if (viewer_) viewer_->AddCurrentFrame(current_frame_);
     return true;
 }

@@ -4,7 +4,8 @@
 #define MYSLAM_OBJECTDETECTION_H
 
 #include "myslam/frame.h"
-#include "Darknet.h"
+// #include "Darknet.h"
+#include "/home/cia1099/project/ML/libtorch-yolov3/Darknet.h"
 
 namespace myslam{
     class Yolov3{
@@ -13,10 +14,12 @@ namespace myslam{
 
         Yolov3(std::string);
         void loadWeight(std::string);
-        void addCurrentFrame(Frame::Ptr);
-        void inference();
+        // void addCurrentFrame(Frame::Ptr);
+        // void inference();
+        void inference(Frame::Ptr);
+        // void checkRun(std::string);
     private: 
-        Darknet net;
+        std::shared_ptr<Darknet> net;
         torch::Device* device;
         Frame::Ptr current_frame_ = nullptr;
         std::mutex frame_data_mutex_;

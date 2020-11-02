@@ -26,7 +26,15 @@ bool VisualOdometry::Init() {
     backend_ = Backend::Ptr(new Backend);
     map_ = Map::Ptr(new Map);
     viewer_ = Viewer::Ptr(new Viewer);
+    std::string cfg_path("/home/cia1099/project/ML/libtorch-yolov3/models/yolov3.cfg");
+    std::string weights_path("/home/cia1099/project/ML/PyTorch-YOLOv3/weights/yolov3.weights");
+    yolo_ = Yolov3::Ptr(new Yolov3(cfg_path));
+    yolo_->loadWeight(weights_path);
+    // std::cout << "=============start yolo detection\n";
+    // yolo_->checkRun("/home/cia1099/Downloads/kitti/sequences/00/image_0/000000.png");
 
+
+    frontend_->SetYolo(yolo_);
     frontend_->SetBackend(backend_);
     frontend_->SetMap(map_);
     frontend_->SetViewer(viewer_);

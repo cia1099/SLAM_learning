@@ -7,6 +7,7 @@
 
 #include <thread>
 #include <pangolin/pangolin.h>
+#include <chrono>
 
 #include "myslam/common_include.h"
 #include "myslam/frame.h"
@@ -59,6 +60,9 @@ class Viewer {
     bool map_updated_ = false;
 
     std::mutex viewer_data_mutex_;
+
+    const double inv_30fps = 0.033333333;
+    std::chrono::steady_clock::time_point record_time_;
 };
 }  // namespace myslam
 
