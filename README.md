@@ -52,20 +52,12 @@ Contents
 其中i,j,k這三個虛數，滿足以下關係式：
 <div align=center>
 
-<img src="http://latex.codecogs.com/gif.latex?\begin{cases}
-i^2=j^2=k^2=-1\\
-ij=k,ji=-k\\
-jk=i,kj=-i\\
-ki=j,ik=-j
-\end{cases}">
+<img src="http://latex.codecogs.com/gif.latex?\begin{cases}i^2=j^2=k^2=-1\\ij=k,ji=-k\\jk=i,kj=-i\\ki=j,ik=-j\end{cases}">
 </div>
 在[p.3-24-3.25]有證明四元數到旋轉向量的轉換公式可得：
 <div align=center>
 
-<img src="http://latex.codecogs.com/gif.latex?\begin{cases}
-\theta=2arccosq_0\\
-(n_x,n_y,n_z)=\frac{(q_1,q_2,q_3)}{sin\frac{\theta}{2}}
-\end{cases}"/>
+<img src="http://latex.codecogs.com/gif.latex?\begin{cases}\theta=2arccosq_0\\(n_x,n_y,n_z)=\frac{(q_1,q_2,q_3)}{sin\frac{\theta}{2}}\end{cases}"/>
 </div>
 
 [Eigen對應MATLAB操作](https://igl.ethz.ch/projects/libigl/matlab-to-eigen.html)
@@ -196,31 +188,9 @@ Perspective-n-Point是求解3D到2D點對的運動方法。它描述了當知道
 考慮某空間點P1，投影到相機座標點x1(以歸一化平面表示)得：
 <div align=center>
 
-<img src="http://latex.codecogs.com/gif.latex?s\begin{pmatrix}
-x_1\\
-y_1\\
-1
-\end{pmatrix}=\begin{pmatrix}
-t_1&t_2&t_3&t_4\\
-t_5&t_6&t_7&t_8\\
-t_9&t_{10}&t_{11}&t_{12}
-\end{pmatrix}\begin{pmatrix}
-X_1\\
-Y_1\\
-Z_1\\
-1
-\end{pmatrix}"/>
+<img src="http://latex.codecogs.com/gif.latex?s\begin{pmatrix}x_1\\y_1\\1\end{pmatrix}=\begin{pmatrix}t_1&t_2&t_3&t_4\\t_5&t_6&t_7&t_8\\t_9&t_{10}&t_{11}&t_{12}\end{pmatrix}\begin{pmatrix}X_1\\Y_1\\Z_1\\1\end{pmatrix}"/>
 ---
-<img src="http://latex.codecogs.com/gif.latex?\Rightarrow\begin{pmatrix}
-\mathbf{P}_1^T&0&-x_1\mathbf{P}_1^T\\
-0&\mathbf{P}_1^T&-y_1\mathbf{P}_1^T\\
-\vdots&\vdots&\vdots\\
-\mathbf{P}_n^T&0&-x_n\mathbf{P}_n^T\\
-0&\mathbf{P}_n^T&-y_n\mathbf{P}_n^T\\
-\end{pmatrix}\begin{pmatrix}
-\mathbf{t}_1\\
-\mathbf{t}_2\\
-\mathbf{t}_3\end{pmatrix}=0"/>
+<img src="http://latex.codecogs.com/gif.latex?\Rightarrow\begin{pmatrix}\mathbf{P}_1^T&0&-x_1\mathbf{P}_1^T\\0&\mathbf{P}_1^T&-y_1\mathbf{P}_1^T\\\vdots&\vdots&\vdots\\\mathbf{P}_n^T&0&-x_n\mathbf{P}_n^T\\0&\mathbf{P}_n^T&-y_n\mathbf{P}_n^T\\\end{pmatrix}\begin{pmatrix}\mathbf{t}_1\\\mathbf{t}_2\\\mathbf{t}_3\end{pmatrix}=0"/>
 </div>
 
 從上式可以發現，每一點 xi 就提供了兩組方程式，求解 t 有12個自由度，但只需要6個點對就有12組方程式，滿足線代的滿秩。<span style="background-color:yellow">注意這裡的相機座標點並非圖像的座標點，這裡的 xi 是還沒乘上相機內參的位置點。</span>因此在程式中對圖像找到的2D-3D匹配點後，還要將 xi 乘上相機內參求解：
@@ -232,22 +202,13 @@ Z_1\\
 我們在李代數裡知道對「指數矩陣」的微分使用擾動模型近似為[p.4-18]：
 <div align=center>
 
-<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{TP}}}{\partial{\mathbf{T}}}=\begin{bmatrix}
-\mathbf{I}&-(\mathbf{TP})^\wedge\\
-\mathbf{0}^T&\mathbf{0}^T
-\end{bmatrix}\equiv(\mathbf{TP})^\odot\in\mathbb{R}^{4\times6}"/>
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{TP}}}{\partial{\mathbf{T}}}=\begin{bmatrix}\mathbf{I}&-(\mathbf{TP})^\wedge\\\mathbf{0}^T&\mathbf{0}^T\end{bmatrix}\equiv(\mathbf{TP})^\odot\in\mathbb{R}^{4\times6}"/>
 
 **Let P' = TP and u' = KP'**
 
 <img src="http://latex.codecogs.com/gif.latex?\therefore\frac{\partial{\mathbf{e}}}{\partial{\mathbf{T}}}=-\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}\frac{\partial{\mathbf{P}'}}{\partial{\mathbf{T}}}"/>
 ---
-<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}=\begin{bmatrix}
-\frac{\partial{u}'}{\partial{X}'}&\frac{\partial{u}'}{\partial{Y}'}&\frac{\partial{u}'}{\partial{Z}'}\\
-\frac{\partial{v}'}{\partial{X}'}&\frac{\partial{v}'}{\partial{Y}'}&\frac{\partial{v}'}{\partial{Z}'}
-\end{bmatrix}=\begin{bmatrix}
-\frac{f_x}{Z'}&0&-\frac{f_xX'}{Z'^2}\\
-0&\frac{f_y}{Z'}&-\frac{f_yY'}{Z'^2}
-\end{bmatrix}"/>
+<img src="http://latex.codecogs.com/gif.latex?\frac{\partial{\mathbf{u}'}}{\partial{\mathbf{P}'}}=\begin{bmatrix}\frac{\partial{u}'}{\partial{X}'}&\frac{\partial{u}'}{\partial{Y}'}&\frac{\partial{u}'}{\partial{Z}'}\\\frac{\partial{v}'}{\partial{X}'}&\frac{\partial{v}'}{\partial{Y}'}&\frac{\partial{v}'}{\partial{Z}'}\end{bmatrix}=\begin{bmatrix}\frac{f_x}{Z'}&0&-\frac{f_xX'}{Z'^2}\\0&\frac{f_y}{Z'}&-\frac{f_yY'}{Z'^2}\end{bmatrix}"/>
 </div>
 
 也有對3D點P作最佳化：
